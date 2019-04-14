@@ -1,12 +1,16 @@
 package me.vuelma.favoritefoods.kitchen;
 
 import me.vuelma.favoritefoods.exception.ResourceNotFoundException;
+import me.vuelma.favoritefoods.ingredient.Ingredient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/kitchens")
@@ -16,40 +20,59 @@ public class KitchenController {
     KitchenRepository kitchenRepository;
 
     @GetMapping("")
-    public List<Kitchen> getAllKitchens() {
-        return kitchenRepository.findAll();
+    public ResponseEntity<List<Kitchen>> getAllKitchens() {
+        List<Kitchen> kitchens = kitchenRepository.findAll();
+
+        if(kitchens.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(kitchens);
     }
 
     @GetMapping("/{id}")
-    public Kitchen getKitchenById(@PathVariable("id") Long kitchenId) {
-        return kitchenRepository.findById(kitchenId).orElseThrow(() ->
-                new ResourceNotFoundException("Kitchen", "id", kitchenId));
+    public ResponseEntity<Kitchen> getKitchenById(@PathVariable("id") long kitchenId) {
+        Optional<Kitchen> kitchen = kitchenRepository.findById(kitchenId);
+
+        if(!kitchen.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(kitchen.get());
     }
 
     @PostMapping("")
-    public Kitchen createKitchen(@Valid @RequestBody Kitchen kitchen) {
-        return kitchenRepository.save(kitchen);
+    public ResponseEntity<Kitchen> createKitchen(@Valid @RequestBody Kitchen kitchen,
+                                                 UriComponentsBuilder ucBuilder){
+        Kitchen createdKitchen =  kitchenRepository.save(kitchen);
+
+        URI createdUri = ucBuilder.path("/kitchens/{id}").buildAndExpand(createdKitchen.getId()).toUri();
+        return ResponseEntity.created(createdUri).body(createdKitchen);
     }
 
     @PutMapping("/{id}")
-    public Kitchen updateKitchen(@PathVariable("id") Long kitchenId,
-                                 @Valid @RequestBody Kitchen kitchenDetails) {
-        Kitchen kitchen = kitchenRepository.findById(kitchenId).orElseThrow(() ->
-                new ResourceNotFoundException("Kitchen", "id", kitchenId));
+    public ResponseEntity<Kitchen> updateKitchen(@PathVariable("id") long kitchenId,
+                                                 @Valid @RequestBody Kitchen kitchenDetails) {
+        Optional<Kitchen> findKitchen = kitchenRepository.findById(kitchenId);
 
+        if(!findKitchen.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+        Kitchen kitchen = findKitchen.get();
         kitchen.setName(kitchenDetails.getName());
 
         Kitchen updatedKitchen = kitchenRepository.save(kitchen);
-        return updatedKitchen;
+        return ResponseEntity.ok(updatedKitchen);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteKitchen(@PathVariable("id") Long kitchenId) {
-        Kitchen kitchen = kitchenRepository.findById(kitchenId).orElseThrow(() ->
-                new ResourceNotFoundException("Kitchen", "id", kitchenId));
+    public ResponseEntity<Kitchen> deleteKitchen(@PathVariable("id") long kitchenId) {
+        Optional<Kitchen> findKitchen = kitchenRepository.findById(kitchenId);
+
+        if(!findKitchen.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+        Kitchen kitchen = findKitchen.get();
 
         kitchenRepository.delete(kitchen);
-
         return ResponseEntity.noContent().build();
     }
 
