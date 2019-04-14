@@ -5,8 +5,10 @@ import me.vuelma.favoritefoods.ingredient.Ingredient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,33 +20,49 @@ public class FoodController {
     private FoodRepository foodRepository;
 
     @GetMapping("")
-    public List<Food> getAllFoods() {
-        return foodRepository.findAll();
+    public ResponseEntity<List<Food>> getAllFoods() {
+        List<Food> foods = foodRepository.findAll();
+
+        if(foods.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(foods);
     }
 
     @GetMapping("/{id}")
-    public Food getFoodById(@PathVariable("id") long foodId){
-        return foodRepository.findById(foodId).orElseThrow(() ->
-                new ResourceNotFoundException("Food", "id", foodId));
+    public ResponseEntity<Food> getFoodById(@PathVariable("id") long foodId){
+        Optional<Food> food =  foodRepository.findById(foodId);
+
+        if(!food.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(food.get());
     }
 
     @PostMapping("")
-    public Food createFood(@Valid @RequestBody Food food){
-        return foodRepository.save(food);
+    public ResponseEntity<Food> createFood(@Valid @RequestBody Food food,
+                           UriComponentsBuilder ucBuilder){
+        Food createdFood =  foodRepository.save(food);
+
+        URI createdUri = ucBuilder.path("/foods/{id}").buildAndExpand(createdFood.getId()).toUri();
+        return ResponseEntity.created(createdUri).body(createdFood);
     }
 
     @PutMapping("/{id}")
-    public Food updateFood(@PathVariable("id") long foodId,
+    public ResponseEntity<Food> updateFood(@PathVariable("id") long foodId,
                            @Valid @RequestBody Food foodDetails){
-        Food food = foodRepository.findById(foodId).orElseThrow(() ->
-                new ResourceNotFoundException("Food", "id", foodId));
+        Optional<Food> findFood = foodRepository.findById(foodId);
 
+        if(!findFood.isPresent()){
+            return  ResponseEntity.notFound().build();
+        }
+        Food food = findFood.get();
         food.setName(foodDetails.getName());
         food.setPreparationTime(foodDetails.getPreparationTime());
         food.setIngredients(foodDetails.getIngredients());
 
         Food updatedFood = foodRepository.save(food);
-        return updatedFood;
+        return ResponseEntity.ok(updatedFood);
     }
 
     @DeleteMapping("/{id}")
@@ -59,6 +77,5 @@ public class FoodController {
         foodRepository.delete(food);
         return ResponseEntity.noContent().build();
     }
-
 
 }

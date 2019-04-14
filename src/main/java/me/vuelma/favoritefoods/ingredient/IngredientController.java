@@ -40,7 +40,8 @@ public class IngredientController {
     }
 
     @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Ingredient> createIngredient(@Valid @RequestBody Ingredient ingredient, UriComponentsBuilder ucBuilder) {
+    public ResponseEntity<Ingredient> createIngredient(@Valid @RequestBody Ingredient ingredient,
+                                                       UriComponentsBuilder ucBuilder) {
         Ingredient createdIngredient = ingredientRepository.save(ingredient);
 
         URI createdUri = ucBuilder.path("/ingredients/{id}").buildAndExpand(createdIngredient.getId()).toUri();
