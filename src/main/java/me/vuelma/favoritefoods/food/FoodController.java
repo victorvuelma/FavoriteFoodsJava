@@ -60,6 +60,7 @@ public class FoodController {
         food.setName(foodDetails.getName());
         food.setPreparationTime(foodDetails.getPreparationTime());
         food.setIngredients(foodDetails.getIngredients());
+        food.setKitchen(foodDetails.getKitchen());
 
         Food updatedFood = foodRepository.save(food);
         return ResponseEntity.ok(updatedFood);
