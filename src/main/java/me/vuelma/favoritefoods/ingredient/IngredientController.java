@@ -30,7 +30,7 @@ public class IngredientController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Ingredient> getIngredientById(@PathVariable("id") Long ingredientId) {
+    public ResponseEntity<Ingredient> getIngredientById(@PathVariable("id") long ingredientId) {
         Optional<Ingredient> ingredient =  ingredientRepository.findById(ingredientId);
 
         if(!ingredient.isPresent()){
@@ -49,7 +49,7 @@ public class IngredientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Ingredient> updateIngredient(@PathVariable("id") Long ingredientId,
+    public ResponseEntity<Ingredient> updateIngredient(@PathVariable("id") long ingredientId,
                                        @Valid @RequestBody Ingredient ingredientDetails) {
         Optional<Ingredient> findIngredient = ingredientRepository.findById(ingredientId);
 
@@ -64,7 +64,7 @@ public class IngredientController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Ingredient> deleteIngredient(@PathVariable("id") Long ingredientId) {
+    public ResponseEntity<Ingredient> deleteIngredient(@PathVariable("id") long ingredientId) {
         Optional<Ingredient> findIngredient = ingredientRepository.findById(ingredientId);
 
         if(!findIngredient.isPresent()){
