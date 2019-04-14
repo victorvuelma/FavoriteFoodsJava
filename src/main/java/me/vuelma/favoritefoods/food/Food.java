@@ -1,9 +1,6 @@
 package me.vuelma.favoritefoods.food;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import me.vuelma.favoritefoods.ingredient.Ingredient;
 import me.vuelma.favoritefoods.kitchen.Kitchen;
@@ -37,8 +34,8 @@ public class Food {
 
     @ManyToMany()
     @JoinTable(name = "food_ingredients",
-            joinColumns = {@JoinColumn(name="foods_id")},
-            inverseJoinColumns = {@JoinColumn(name="ingredients_id")})
+            joinColumns = {@JoinColumn(name = "foods_id")},
+            inverseJoinColumns = {@JoinColumn(name = "ingredients_id")})
     private List<Ingredient> ingredients;
 
     @Column(nullable = false, updatable = false)

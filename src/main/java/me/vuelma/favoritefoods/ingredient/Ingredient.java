@@ -1,9 +1,7 @@
 package me.vuelma.favoritefoods.ingredient;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import me.vuelma.favoritefoods.food.Food;
@@ -33,10 +31,10 @@ public class Ingredient implements Serializable {
     @NotBlank
     private String name;
 
-    @ManyToMany(cascade ={CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(name = "food_ingredients",
-            joinColumns = {@JoinColumn(name="ingredients_id")},
-            inverseJoinColumns = {@JoinColumn(name="foods_id")})
+            joinColumns = {@JoinColumn(name = "ingredients_id")},
+            inverseJoinColumns = {@JoinColumn(name = "foods_id")})
     @JsonBackReference
     private List<Food> foods;
 

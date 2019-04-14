@@ -90,20 +90,20 @@ public class FoodController {
 
     @PutMapping("/{f_id}/ingredients/{i_id}")
     public ResponseEntity<List<Ingredient>> addFoodIngredient(@PathVariable("f_id") long foodId,
-                                                              @PathVariable("i_id") long ingredientId){
-        Optional<Food> findFood =  foodRepository.findById(foodId);
-        if(!findFood.isPresent()){
+                                                              @PathVariable("i_id") long ingredientId) {
+        Optional<Food> findFood = foodRepository.findById(foodId);
+        if (!findFood.isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
-        Optional<Ingredient> findIngredient =  ingredientRepository.findById(ingredientId);
-        if(!findIngredient.isPresent()){
+        Optional<Ingredient> findIngredient = ingredientRepository.findById(ingredientId);
+        if (!findIngredient.isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
         Food food = findFood.get();
         Ingredient ingredient = findIngredient.get();
-        if(!food.getIngredients().contains(ingredient)){
+        if (!food.getIngredients().contains(ingredient)) {
             food.getIngredients().add(ingredient);
             food = foodRepository.save(food);
         }
@@ -112,24 +112,24 @@ public class FoodController {
 
     @DeleteMapping("/{f_id}/ingredients/{i_id}")
     public ResponseEntity<List<Ingredient>> removeFoodIngredient(@PathVariable("f_id") long foodId,
-                                                                 @PathVariable("i_id") long ingredientId){
-        Optional<Food> findFood =  foodRepository.findById(foodId);
-        if(!findFood.isPresent()){
+                                                                 @PathVariable("i_id") long ingredientId) {
+        Optional<Food> findFood = foodRepository.findById(foodId);
+        if (!findFood.isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
-        Optional<Ingredient> findIngredient =  ingredientRepository.findById(ingredientId);
-        if(!findIngredient.isPresent()){
+        Optional<Ingredient> findIngredient = ingredientRepository.findById(ingredientId);
+        if (!findIngredient.isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
         Food food = findFood.get();
         Ingredient ingredient = findIngredient.get();
-        if(food.getIngredients().contains(ingredient)){
+        if (food.getIngredients().contains(ingredient)) {
             food.getIngredients().remove(ingredient);
             food = foodRepository.save(food);
         }
         return ResponseEntity.ok(food.getIngredients());
     }
-    
+
 }
