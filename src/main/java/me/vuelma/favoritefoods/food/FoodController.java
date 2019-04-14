@@ -23,9 +23,6 @@ public class FoodController {
     public ResponseEntity<List<Food>> getAllFoods() {
         List<Food> foods = foodRepository.findAll();
 
-        if(foods.isEmpty()){
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(foods);
     }
 

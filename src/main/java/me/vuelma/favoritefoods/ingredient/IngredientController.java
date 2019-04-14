@@ -23,9 +23,6 @@ public class IngredientController {
     public ResponseEntity<List<Ingredient>> getAllIngredients() {
         List<Ingredient> allIngredients = ingredientRepository.findAll();
 
-        if(allIngredients.isEmpty()){
-            return ResponseEntity.noContent().build();
-        }
         return ResponseEntity.ok(allIngredients);
     }
 

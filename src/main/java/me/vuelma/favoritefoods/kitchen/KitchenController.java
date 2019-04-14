@@ -23,9 +23,6 @@ public class KitchenController {
     public ResponseEntity<List<Kitchen>> getAllKitchens() {
         List<Kitchen> kitchens = kitchenRepository.findAll();
 
-        if(kitchens.isEmpty()){
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(kitchens);
     }
 
