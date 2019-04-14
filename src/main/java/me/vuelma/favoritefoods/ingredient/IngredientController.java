@@ -2,11 +2,15 @@ package me.vuelma.favoritefoods.ingredient;
 
 import me.vuelma.favoritefoods.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/ingredients")
@@ -16,41 +20,59 @@ public class IngredientController {
     IngredientRepository ingredientRepository;
 
     @GetMapping("")
-    public List<Ingredient> getAllIngredients() {
-        return ingredientRepository.findAll();
+    public ResponseEntity<List<Ingredient>> getAllIngredients() {
+        List<Ingredient> allIngredients = ingredientRepository.findAll();
+
+        if(allIngredients.isEmpty()){
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(allIngredients);
     }
 
     @GetMapping("/{id}")
-    public Ingredient getIngredientById(@PathVariable(value = "id") Long ingredientId) {
-        return ingredientRepository.findById(ingredientId).orElseThrow(() ->
-                new ResourceNotFoundException("Ingredient", "id", ingredientId));
+    public ResponseEntity<Ingredient> getIngredientById(@PathVariable("id") Long ingredientId) {
+        Optional<Ingredient> ingredient =  ingredientRepository.findById(ingredientId);
+
+        if(!ingredient.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(ingredient.get());
     }
 
-    @PostMapping("")
-    public Ingredient createIngredient(@Valid @RequestBody Ingredient ingredient) {
-        return ingredientRepository.save(ingredient);
+    @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Ingredient> createIngredient(@Valid @RequestBody Ingredient ingredient, UriComponentsBuilder ucBuilder) {
+        Ingredient createdIngredient = ingredientRepository.save(ingredient);
+
+        URI createdUri = ucBuilder.path("/ingredients/{id}").buildAndExpand(createdIngredient.getId()).toUri();
+        return ResponseEntity.created(createdUri).body(createdIngredient);
     }
 
     @PutMapping("/{id}")
-    public Ingredient updateIngredient(@PathVariable(value = "id") Long ingredientId,
+    public ResponseEntity<Ingredient> updateIngredient(@PathVariable("id") Long ingredientId,
                                        @Valid @RequestBody Ingredient ingredientDetails) {
-        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() ->
-                new ResourceNotFoundException("Ingredient", "id", ingredientId));
+        Optional<Ingredient> findIngredient = ingredientRepository.findById(ingredientId);
 
+        if(!findIngredient.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+        Ingredient ingredient = findIngredient.get();
         ingredient.setName(ingredientDetails.getName());
 
         Ingredient updatedIngredient = ingredientRepository.save(ingredient);
-        return updatedIngredient;
+        return ResponseEntity.ok(updatedIngredient);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteIngredient(@PathVariable(value = "id") Long ingredientId) {
-        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() ->
-                new ResourceNotFoundException("Ingredient", "id", ingredientId));
+    public ResponseEntity<Ingredient> deleteIngredient(@PathVariable("id") Long ingredientId) {
+        Optional<Ingredient> findIngredient = ingredientRepository.findById(ingredientId);
+
+        if(!findIngredient.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+        Ingredient ingredient = findIngredient.get();
 
         ingredientRepository.delete(ingredient);
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 }

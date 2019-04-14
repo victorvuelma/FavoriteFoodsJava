@@ -21,7 +21,7 @@ public class KitchenController {
     }
 
     @GetMapping("/{id}")
-    public Kitchen getKitchenById(@PathVariable(value = "id") Long kitchenId) {
+    public Kitchen getKitchenById(@PathVariable("id") Long kitchenId) {
         return kitchenRepository.findById(kitchenId).orElseThrow(() ->
                 new ResourceNotFoundException("Kitchen", "id", kitchenId));
     }
@@ -32,7 +32,7 @@ public class KitchenController {
     }
 
     @PutMapping("/{id}")
-    public Kitchen updateKitchen(@PathVariable(value = "id") Long kitchenId,
+    public Kitchen updateKitchen(@PathVariable("id") Long kitchenId,
                                  @Valid @RequestBody Kitchen kitchenDetails) {
         Kitchen kitchen = kitchenRepository.findById(kitchenId).orElseThrow(() ->
                 new ResourceNotFoundException("Kitchen", "id", kitchenId));
@@ -44,13 +44,13 @@ public class KitchenController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteKitchen(@PathVariable(value = "id") Long kitchenId) {
+    public ResponseEntity<?> deleteKitchen(@PathVariable("id") Long kitchenId) {
         Kitchen kitchen = kitchenRepository.findById(kitchenId).orElseThrow(() ->
                 new ResourceNotFoundException("Kitchen", "id", kitchenId));
 
         kitchenRepository.delete(kitchen);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 }

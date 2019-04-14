@@ -1,30 +1,28 @@
-package me.vuelma.favoritefoods.ingredient;
+package me.vuelma.favoritefoods.food;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import me.vuelma.favoritefoods.food.Food;
+import me.vuelma.favoritefoods.ingredient.Ingredient;
+import me.vuelma.favoritefoods.kitchen.Kitchen;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 @Data
 @Entity
-@EqualsAndHashCode
-@Table(name = "ingredients")
+@Table(name = "foods")
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(value = {"createdAt", "updatedAt"},
         allowGetters = true)
-public class Ingredient implements Serializable {
+public class Food {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -32,13 +30,16 @@ public class Ingredient implements Serializable {
 
     @NotBlank
     private String name;
+    private int preparationTime;
 
-    @ManyToMany(cascade ={CascadeType.MERGE})
+    @ManyToOne
+    private Kitchen kitchen;
+
+    @ManyToMany()
     @JoinTable(name = "food_ingredients",
-            joinColumns = {@JoinColumn(name="ingredients_id")},
-            inverseJoinColumns = {@JoinColumn(name="foods_id")})
-    @JsonBackReference
-    private List<Food> foods;
+            joinColumns = {@JoinColumn(name="foods_id")},
+            inverseJoinColumns = {@JoinColumn(name="ingredients_id")})
+    private List<Ingredient> ingredients;
 
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
