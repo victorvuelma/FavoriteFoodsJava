@@ -1,6 +1,5 @@
 package me.vuelma.favoritefoods.ingredient;
 
-import me.vuelma.favoritefoods.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +27,9 @@ public class IngredientController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Ingredient> getIngredientById(@PathVariable("id") long ingredientId) {
-        Optional<Ingredient> ingredient =  ingredientRepository.findById(ingredientId);
+        Optional<Ingredient> ingredient = ingredientRepository.findById(ingredientId);
 
-        if(!ingredient.isPresent()){
+        if (!ingredient.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(ingredient.get());
@@ -47,10 +46,10 @@ public class IngredientController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Ingredient> updateIngredient(@PathVariable("id") long ingredientId,
-                                       @Valid @RequestBody Ingredient ingredientDetails) {
+                                                       @Valid @RequestBody Ingredient ingredientDetails) {
         Optional<Ingredient> findIngredient = ingredientRepository.findById(ingredientId);
 
-        if(!findIngredient.isPresent()){
+        if (!findIngredient.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         Ingredient ingredient = findIngredient.get();
@@ -64,7 +63,7 @@ public class IngredientController {
     public ResponseEntity<Ingredient> deleteIngredient(@PathVariable("id") long ingredientId) {
         Optional<Ingredient> findIngredient = ingredientRepository.findById(ingredientId);
 
-        if(!findIngredient.isPresent()){
+        if (!findIngredient.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         Ingredient ingredient = findIngredient.get();

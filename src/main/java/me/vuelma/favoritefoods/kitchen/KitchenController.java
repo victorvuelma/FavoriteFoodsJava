@@ -1,7 +1,5 @@
 package me.vuelma.favoritefoods.kitchen;
 
-import me.vuelma.favoritefoods.exception.ResourceNotFoundException;
-import me.vuelma.favoritefoods.ingredient.Ingredient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +28,7 @@ public class KitchenController {
     public ResponseEntity<Kitchen> getKitchenById(@PathVariable("id") long kitchenId) {
         Optional<Kitchen> kitchen = kitchenRepository.findById(kitchenId);
 
-        if(!kitchen.isPresent()){
+        if (!kitchen.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(kitchen.get());
@@ -38,8 +36,8 @@ public class KitchenController {
 
     @PostMapping("")
     public ResponseEntity<Kitchen> createKitchen(@Valid @RequestBody Kitchen kitchen,
-                                                 UriComponentsBuilder ucBuilder){
-        Kitchen createdKitchen =  kitchenRepository.save(kitchen);
+                                                 UriComponentsBuilder ucBuilder) {
+        Kitchen createdKitchen = kitchenRepository.save(kitchen);
 
         URI createdUri = ucBuilder.path("/kitchens/{id}").buildAndExpand(createdKitchen.getId()).toUri();
         return ResponseEntity.created(createdUri).body(createdKitchen);
@@ -50,7 +48,7 @@ public class KitchenController {
                                                  @Valid @RequestBody Kitchen kitchenDetails) {
         Optional<Kitchen> findKitchen = kitchenRepository.findById(kitchenId);
 
-        if(!findKitchen.isPresent()){
+        if (!findKitchen.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         Kitchen kitchen = findKitchen.get();
@@ -64,7 +62,7 @@ public class KitchenController {
     public ResponseEntity<Kitchen> deleteKitchen(@PathVariable("id") long kitchenId) {
         Optional<Kitchen> findKitchen = kitchenRepository.findById(kitchenId);
 
-        if(!findKitchen.isPresent()){
+        if (!findKitchen.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         Kitchen kitchen = findKitchen.get();
