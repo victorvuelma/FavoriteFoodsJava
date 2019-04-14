@@ -76,4 +76,15 @@ public class FoodController {
         return ResponseEntity.noContent().build();
     }
 
+
+    @GetMapping("/{f_id}/ingredients")
+    public ResponseEntity<List<Ingredient>> getIngredientsByFoodId(@PathVariable("f_id") long foodId){
+        Optional<Food> food =  foodRepository.findById(foodId);
+
+        if(!food.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(food.get().getIngredients());
+    }
+
 }
