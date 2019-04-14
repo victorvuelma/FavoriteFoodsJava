@@ -15,25 +15,27 @@ public class IngredientController {
     @Autowired
     IngredientRepository ingredientRepository;
 
-    @GetMapping("/")
+    @GetMapping("")
     public List<Ingredient> getAllIngredients() {
         return ingredientRepository.findAll();
     }
 
-    @RequestMapping("/{id}")
+    @GetMapping("/{id}")
     public Ingredient getIngredientById(@PathVariable(value = "id") Long ingredientId) {
         return ingredientRepository.findById(ingredientId).orElseThrow(() ->
                 new ResourceNotFoundException("Ingredient", "id", ingredientId));
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public Ingredient createIngredient(@Valid @RequestBody Ingredient ingredient) {
         return ingredientRepository.save(ingredient);
     }
 
     @PutMapping("/{id}")
-    public Ingredient updateIngredient(@PathVariable(value = "id") Long ingredientId, @Valid @RequestBody Ingredient ingredientDetails) {
-        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> new ResourceNotFoundException("Ingredient", "id", ingredientId));
+    public Ingredient updateIngredient(@PathVariable(value = "id") Long ingredientId,
+                                       @Valid @RequestBody Ingredient ingredientDetails) {
+        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() ->
+                new ResourceNotFoundException("Ingredient", "id", ingredientId));
 
         ingredient.setName(ingredientDetails.getName());
 
@@ -43,7 +45,8 @@ public class IngredientController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteIngredient(@PathVariable(value = "id") Long ingredientId) {
-        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> new ResourceNotFoundException("Ingredient", "id", ingredientId));
+        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() ->
+                new ResourceNotFoundException("Ingredient", "id", ingredientId));
 
         ingredientRepository.delete(ingredient);
 
