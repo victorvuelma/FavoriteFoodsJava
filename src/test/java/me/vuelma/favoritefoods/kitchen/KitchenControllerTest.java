@@ -9,8 +9,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -30,18 +33,32 @@ public class KitchenControllerTest {
     private KitchenRepository kitchenRepository;
 
     @Test
-    public void findById_NotFound() throws Exception {
-        when(kitchenRepository.findById(1L)).thenReturn(Optional.empty());
+    public void getAllKitchens() throws  Exception{
+        Kitchen kitchen1 = new Kitchen();
+        kitchen1.setId(1L);
+        kitchen1.setName("Italiana");
 
-        mockMvc.perform(get("/kitchens/{id}", 1L))
-                .andExpect(status().isNotFound());
+        Kitchen kitchen2 = new Kitchen();
+        kitchen2.setId(2L);
+        kitchen2.setName("Francesa");
 
-        verify(kitchenRepository, times(1)).findById(1L);
-        verifyNoMoreInteractions(kitchenRepository);
+        List<Kitchen> kitchens = Arrays.asList(kitchen1, kitchen2);
+
+        when(kitchenRepository.findAll()).thenReturn(kitchens);
+
+        mockMvc.perform(get("/kitchens"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[0].name", is("Italiana")))
+                .andExpect(jsonPath("$[1].id", is(2)))
+                .andExpect(jsonPath("$[1].name", is("Francesa")));
+
     }
 
     @Test
-    public void findById_Found() throws Exception {
+    public void getKitchenById_Ok() throws Exception {
         Kitchen kitchen = new Kitchen();
         kitchen.setName("Italiana");
         kitchen.setId(1L);
@@ -59,7 +76,18 @@ public class KitchenControllerTest {
     }
 
     @Test
-    public void addKitchen_Ok() throws  Exception{
+    public void getKitchenById_NotFound() throws Exception {
+        when(kitchenRepository.findById(1L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/kitchens/{id}", 1L))
+                .andExpect(status().isNotFound());
+
+        verify(kitchenRepository, times(1)).findById(1L);
+        verifyNoMoreInteractions(kitchenRepository);
+    }
+
+    @Test
+    public void createKitchen_Ok() throws  Exception{
         Kitchen kitchen = new Kitchen();
         kitchen.setId(1L);
         kitchen.setName("Francesa");
@@ -79,7 +107,7 @@ public class KitchenControllerTest {
     }
 
     @Test
-    public void updateKitchen_Found() throws Exception{
+    public void updateKitchen_Ok() throws Exception{
         Kitchen kitchen = new Kitchen();
         kitchen.setName("Italiana");
         kitchen.setId(1L);
@@ -116,5 +144,35 @@ public class KitchenControllerTest {
         verify(kitchenRepository, times(1)).findById(1L);
         verifyNoMoreInteractions(kitchenRepository);
     }
-    
+
+    @Test
+    public void deleteKitchen_Ok() throws Exception {
+        Kitchen kitchen = new Kitchen();
+        kitchen.setName("Italiana");
+        kitchen.setId(1L);
+
+        when(kitchenRepository.findById(1L)).thenReturn(Optional.of(kitchen));
+
+        mockMvc.perform(delete("/kitchens/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Italiana")));
+
+        verify(kitchenRepository, times(1)).findById(1L);
+        verify(kitchenRepository, times(1)).delete(kitchen);
+        verifyNoMoreInteractions(kitchenRepository);
+    }
+
+    @Test
+    public void deleteKitchen_NotFound() throws Exception {
+                when(kitchenRepository.findById(1L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(delete("/kitchens/{id}", 1L))
+                .andExpect(status().isNoContent());
+
+        verify(kitchenRepository, times(1)).findById(1L);
+        verifyNoMoreInteractions(kitchenRepository);
+    }
+
 }
