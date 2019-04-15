@@ -2,7 +2,9 @@ package me.vuelma.favoritefoods.kitchen;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import me.vuelma.favoritefoods.food.Food;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -14,7 +16,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-@Data
+@EqualsAndHashCode
+@Getter
 @Entity
 @Table(name = "kitchens")
 @EntityListeners(AuditingEntityListener.class)
@@ -23,9 +26,11 @@ public class Kitchen implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Setter
     private Long id;
 
     @NotBlank
+    @Setter
     private String name;
 
     @OneToMany(mappedBy = "kitchen", cascade = CascadeType.REMOVE)
