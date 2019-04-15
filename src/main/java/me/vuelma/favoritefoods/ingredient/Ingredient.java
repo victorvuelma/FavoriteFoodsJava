@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +33,7 @@ public class Ingredient implements Serializable {
     private long id;
 
     @NotBlank
+    @NotNull(message = "Provide ingredient Name")
     @Setter
     private String name;
 

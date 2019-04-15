@@ -9,7 +9,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -26,10 +28,14 @@ public class Food {
     private long id;
 
     @NotBlank
+    @NotNull(message = "Provide ingredient Name")
     private String name;
+    @NotNull
+    @Min(value = 1, message = "Preparation time should be equal or more than 1")
     private int preparationTime;
 
     @ManyToOne
+    @NotNull
     private Kitchen kitchen;
 
     @ManyToMany()
