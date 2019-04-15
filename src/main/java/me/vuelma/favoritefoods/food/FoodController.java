@@ -49,11 +49,15 @@ public class FoodController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Food> updateFood(@PathVariable("id") long foodId,
-                                           @Valid @RequestBody Food foodDetails) {
+                                           @Valid @RequestBody Food foodDetails,
+                                           UriComponentsBuilder ucBuilder) {
         Optional<Food> findFood = foodRepository.findById(foodId);
 
         if (!findFood.isPresent()) {
-            return ResponseEntity.notFound().build();
+            Food createdFood = foodRepository.save(foodDetails);
+
+            URI createdUri = ucBuilder.path("/foods/{id}").buildAndExpand(createdFood.getId()).toUri();
+            return ResponseEntity.created(createdUri).body(createdFood);
         }
         Food food = findFood.get();
         food.setName(foodDetails.getName());
@@ -66,7 +70,7 @@ public class FoodController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Food> deleteIngredient(@PathVariable("id") long foodId) {
+    public ResponseEntity<Food> deleteFood(@PathVariable("id") long foodId) {
         Optional<Food> foundFood = foodRepository.findById(foodId);
 
         if (!foundFood.isPresent()) {
