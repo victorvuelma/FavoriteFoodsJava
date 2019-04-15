@@ -33,6 +33,7 @@ public class Ingredient implements Serializable {
     private long id;
 
     @NotBlank
+    @Column(unique = true)
     @NotNull(message = "Provide ingredient Name")
     @Setter
     private String name;

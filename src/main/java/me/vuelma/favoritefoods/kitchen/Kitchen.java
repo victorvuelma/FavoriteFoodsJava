@@ -31,6 +31,7 @@ public class Kitchen implements Serializable {
     private Long id;
 
     @NotBlank
+    @Column(unique = true)
     @NotNull(message = "Provide kitchen Name")
     @Setter
     private String name;

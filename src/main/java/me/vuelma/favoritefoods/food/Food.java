@@ -28,6 +28,7 @@ public class Food {
     private long id;
 
     @NotBlank
+    @Column(unique = true)
     @NotNull(message = "Provide ingredient Name")
     private String name;
     @NotNull
