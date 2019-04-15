@@ -74,12 +74,12 @@ public class FoodController {
         Optional<Food> foundFood = foodRepository.findById(foodId);
 
         if (!foundFood.isPresent()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
         Food food = foundFood.get();
 
         foodRepository.delete(food);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(food);
     }
 
     @GetMapping("/{f_id}/ingredients")
