@@ -1,26 +1,21 @@
 package me.vuelma.favoritefoods.kitchen;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import me.vuelma.favoritefoods.TestUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
+import java.util.Optional;
 
-import static java.util.Collections.singletonList;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.*;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @RunWith(SpringRunner.class)
@@ -28,59 +23,98 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class KitchenControllerTest {
 
     @Autowired
-    private MockMvc mvc;
+    private MockMvc mockMvc;
 
+    @Autowired
     @MockBean
-    private KitchenController kitchenController;
+    private KitchenRepository kitchenRepository;
 
     @Test
-    public void getKitchens() throws Exception {
+    public void findById_NotFound() throws Exception {
+        when(kitchenRepository.findById(1L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/kitchens/{id}", 1L))
+                .andExpect(status().isNotFound());
+
+        verify(kitchenRepository, times(1)).findById(1L);
+        verifyNoMoreInteractions(kitchenRepository);
+    }
+
+    @Test
+    public void findById_Found() throws Exception {
         Kitchen kitchen = new Kitchen();
         kitchen.setName("Italiana");
+        kitchen.setId(1L);
 
-        List<Kitchen> allKitchens = singletonList(kitchen);
+        when(kitchenRepository.findById(1L)).thenReturn(Optional.of(kitchen));
 
-        given(kitchenController.getAllKitchens()).willReturn(ResponseEntity.ok(allKitchens));
-
-        mvc.perform(get("/kitchens")
-                .contentType(APPLICATION_JSON))
+        mockMvc.perform(get("/kitchens/{id}", 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is(kitchen.getName())));
+                .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Italiana")));
+
+        verify(kitchenRepository, times(1)).findById(1L);
+        verifyNoMoreInteractions(kitchenRepository);
     }
 
     @Test
-    public void getKitchenById() throws Exception {
+    public void addKitchen_Ok() throws  Exception{
         Kitchen kitchen = new Kitchen();
+        kitchen.setId(1L);
         kitchen.setName("Francesa");
-        kitchen.setId(1321l);
 
-        given(kitchenController.getKitchenById(kitchen.getId())).willReturn(ResponseEntity.ok(kitchen));
+        when(kitchenRepository.save(kitchen)).thenReturn(kitchen);
 
-        mvc.perform(get("/kitchens/" + kitchen.getId())
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("name", is(kitchen.getName())));
+        mockMvc.perform(post("/kitchens")
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(kitchen)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Francesa")));
+
+        verify(kitchenRepository, times(1)).save(kitchen);
+        verifyNoMoreInteractions(kitchenRepository);
     }
 
     @Test
-    public void storeKitchen() throws Exception {
+    public void updateKitchen_Found() throws Exception{
         Kitchen kitchen = new Kitchen();
-        kitchen.setName("Francesa");
+        kitchen.setName("Italiana");
+        kitchen.setId(1L);
 
-        mvc.perform(post("/kitchens")
-                .contentType(APPLICATION_JSON)
-                .content(asJsonString(kitchen)))
-                .andExpect(status().isOk());
+        when(kitchenRepository.findById(1L)).thenReturn(Optional.of(kitchen));
+        when(kitchenRepository.save(kitchen)).thenReturn(kitchen);
+
+        mockMvc.perform(put("/kitchens/{id}", 1L)
+        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+        .content(TestUtil.convertObjectToJsonBytes(kitchen)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Italiana")));
+
+        verify(kitchenRepository, times(1)).findById(1L);
+        verify(kitchenRepository, times(1)).save(kitchen);
+        verifyNoMoreInteractions(kitchenRepository);
     }
 
-    public static String asJsonString(Object obj) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    @Test
+    public void updateKitchen_NotFound() throws Exception{
+        Kitchen kitchen = new Kitchen();
+        kitchen.setName("Italiana");
+        kitchen.setId(1L);
 
+        when(kitchenRepository.findById(1L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(put("/kitchens/{id}", 1L)
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(kitchen)))
+                .andExpect(status().isNotFound());
+
+        verify(kitchenRepository, times(1)).findById(1L);
+        verifyNoMoreInteractions(kitchenRepository);
+    }
+    
 }
