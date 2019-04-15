@@ -46,11 +46,15 @@ public class IngredientController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Ingredient> updateIngredient(@PathVariable("id") long ingredientId,
-                                                       @Valid @RequestBody Ingredient ingredientDetails) {
+                                                       @Valid @RequestBody Ingredient ingredientDetails,
+                                                       UriComponentsBuilder ucBuilder) {
         Optional<Ingredient> findIngredient = ingredientRepository.findById(ingredientId);
 
         if (!findIngredient.isPresent()) {
-            return ResponseEntity.notFound().build();
+            Ingredient createdIngredient = ingredientRepository.save(ingredientDetails);
+
+            URI createdUri = ucBuilder.path("/ingredients/{id}").buildAndExpand(createdIngredient.getId()).toUri();
+            return ResponseEntity.created(createdUri).body(createdIngredient);
         }
         Ingredient ingredient = findIngredient.get();
         ingredient.setName(ingredientDetails.getName());

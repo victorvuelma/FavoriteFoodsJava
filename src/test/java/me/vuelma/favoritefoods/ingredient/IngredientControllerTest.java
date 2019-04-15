@@ -133,19 +133,23 @@ public class IngredientControllerTest {
     }
 
     @Test
-    public void updateIngredient_NotFound() throws Exception {
+    public void updateIngredient_Created() throws Exception {
         Ingredient ingredient = new Ingredient();
         ingredient.setId(1L);
         ingredient.setName("Carne");
 
         when(ingredientRepository.findById(1L)).thenReturn(Optional.empty());
+        when(ingredientRepository.save(ingredient)).thenReturn(ingredient);
 
         mockMvc.perform(put("/ingredients/{id}", 1L)
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(ingredient)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Carne")));;
 
         verify(ingredientRepository, times(1)).findById(1L);
+        verify(ingredientRepository,times(1)).save(ingredient);
         verifyNoMoreInteractions(ingredientRepository);
     }
 
