@@ -113,18 +113,22 @@ public class KitchenControllerTest {
         kitchen.setId(1L);
 
         when(kitchenRepository.findById(1L)).thenReturn(Optional.of(kitchen));
-        when(kitchenRepository.save(kitchen)).thenReturn(kitchen);
+
+        Kitchen updatedKitchen = new Kitchen();
+        updatedKitchen.setName("Carne");
+        updatedKitchen.setId(1L);
+        when(kitchenRepository.save(updatedKitchen)).thenReturn(updatedKitchen);
 
         mockMvc.perform(put("/kitchens/{id}", 1L)
         .contentType(TestUtil.APPLICATION_JSON_UTF8)
-        .content(TestUtil.convertObjectToJsonBytes(kitchen)))
+        .content(TestUtil.convertObjectToJsonBytes(updatedKitchen)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("Italiana")));
+                .andExpect(jsonPath("$.name", is("Carne")));
 
         verify(kitchenRepository, times(1)).findById(1L);
-        verify(kitchenRepository, times(1)).save(kitchen);
+        verify(kitchenRepository, times(1)).save(updatedKitchen);
         verifyNoMoreInteractions(kitchenRepository);
     }
 
