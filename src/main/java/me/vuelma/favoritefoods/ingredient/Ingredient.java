@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import me.vuelma.favoritefoods.food.Food;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -15,8 +17,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-@Data
 @Entity
+@Getter
 @EqualsAndHashCode
 @Table(name = "ingredients")
 @EntityListeners(AuditingEntityListener.class)
@@ -26,9 +28,11 @@ public class Ingredient implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Setter
     private long id;
 
     @NotBlank
+    @Setter
     private String name;
 
     @ManyToMany(cascade = {CascadeType.MERGE})

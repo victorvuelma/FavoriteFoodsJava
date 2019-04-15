@@ -64,12 +64,12 @@ public class IngredientController {
         Optional<Ingredient> findIngredient = ingredientRepository.findById(ingredientId);
 
         if (!findIngredient.isPresent()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
         Ingredient ingredient = findIngredient.get();
 
         ingredientRepository.delete(ingredient);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ingredient);
     }
 
 }
