@@ -113,12 +113,11 @@ public class IngredientControllerTest {
         ingredient.setId(1L);
         ingredient.setName("Carne");
 
-        when(ingredientRepository.findById(1L)).thenReturn(Optional.of(ingredient));
-
         Ingredient updatedIngredient = new Ingredient();
-        updatedIngredient.setId(1L);
         updatedIngredient.setName("Macarrão");
-        when(ingredientRepository.save(updatedIngredient)).thenReturn(updatedIngredient);
+
+        when(ingredientRepository.findById(1L)).thenReturn(Optional.of(ingredient));
+        when(ingredientRepository.save(ingredient)).thenReturn(ingredient);
 
         mockMvc.perform(put("/ingredients/{id}", 1L)
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -129,7 +128,7 @@ public class IngredientControllerTest {
                 .andExpect(jsonPath("$.name", is("Macarrão")));
 
         verify(ingredientRepository, times(1)).findById(1L);
-        verify(ingredientRepository, times(1)).save(updatedIngredient);
+        verify(ingredientRepository, times(1)).save(ingredient);
         verifyNoMoreInteractions(ingredientRepository);
     }
 
