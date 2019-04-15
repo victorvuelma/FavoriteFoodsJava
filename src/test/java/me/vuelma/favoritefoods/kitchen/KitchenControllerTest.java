@@ -132,19 +132,23 @@ public class KitchenControllerTest {
     }
 
     @Test
-    public void updateKitchen_NotFound() throws Exception{
+    public void updateKitchen_Created() throws Exception{
         Kitchen kitchen = new Kitchen();
         kitchen.setName("Italiana");
         kitchen.setId(1L);
 
         when(kitchenRepository.findById(1L)).thenReturn(Optional.empty());
+        when(kitchenRepository.save(kitchen)).thenReturn(kitchen);
 
         mockMvc.perform(put("/kitchens/{id}", 1L)
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(kitchen)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Italiana")));
 
         verify(kitchenRepository, times(1)).findById(1L);
+        verify(kitchenRepository, times(1)).save(kitchen);
         verifyNoMoreInteractions(kitchenRepository);
     }
 

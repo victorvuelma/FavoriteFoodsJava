@@ -45,11 +45,15 @@ public class KitchenController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Kitchen> updateKitchen(@PathVariable("id") long kitchenId,
-                                                 @Valid @RequestBody Kitchen kitchenDetails) {
+                                                 @Valid @RequestBody Kitchen kitchenDetails,
+                                                 UriComponentsBuilder ucBuilder) {
         Optional<Kitchen> findKitchen = kitchenRepository.findById(kitchenId);
 
         if (!findKitchen.isPresent()) {
-            return ResponseEntity.notFound().build();
+            Kitchen createdKitchen = kitchenRepository.save(kitchenDetails);
+
+            URI createdUri = ucBuilder.path("/kitchens/{id}").buildAndExpand(createdKitchen.getId()).toUri();
+            return ResponseEntity.created(createdUri).body(createdKitchen);
         }
         Kitchen kitchen = findKitchen.get();
         kitchen.setName(kitchenDetails.getName());
