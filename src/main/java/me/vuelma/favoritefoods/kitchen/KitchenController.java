@@ -63,12 +63,12 @@ public class KitchenController {
         Optional<Kitchen> findKitchen = kitchenRepository.findById(kitchenId);
 
         if (!findKitchen.isPresent()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
         Kitchen kitchen = findKitchen.get();
 
         kitchenRepository.delete(kitchen);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(kitchen);
     }
 
 }
